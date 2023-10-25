@@ -3,9 +3,8 @@
 // expect(element).toHaveTextContent(/react/i)
 // learn more: https://github.com/testing-library/jest-dom
 import '@testing-library/jest-dom';
-/*
-import { render, screen } from '@testing-library/react';
-import Todo from './Todos/Todo';
+import { render } from '@testing-library/react';
+import Todo from './Todo';
 
 describe('<Todo />', () => {
   let container;
@@ -18,16 +17,19 @@ describe('<Todo />', () => {
       done: false
     }
 
-    container = render(<Todo todo={todo} onClickDelete={onClickDelete} onClickComplete={onClickComplete} />).container
+    /* eslint-disable-next-line */
+    container = render(<Todo todo={todo} onClickDelete={onClickDelete} onClickComplete={onClickComplete} />).container 
   });
 
   test('Renders text and done fields', () => {
+    /* eslint-disable-next-line */
     const text = container.querySelector('.text');
     expect(text).toHaveTextContent('A test todo');
 
+    /* eslint-disable-next-line */
     const todo = container.querySelector('.todo');
     expect(todo).toHaveTextContent('This todo is not done');
   });
 
 });
-*/
+
