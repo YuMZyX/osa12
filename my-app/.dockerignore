@@ -1,0 +1,7 @@
+.dockerignore
+.gitignore
+node_modules
+mongo_data
+bloglist-backend/mongo_data
+bloglist-backend/node_modules
+bloglist-frontend/node_modules
