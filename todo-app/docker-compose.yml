@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  server:
+    image: todo-backend
+    depends_on:
+      - mongodb
+      - redis
+    build:
+      context: .
+      dockerfile: ./todo-backend/Dockerfile
+    ports:
+      - 3001:3001
+    volumes:
+      - ./todo-backend/:/usr/src/app
+    environment:
+      - REDIS_URL=redis://redis
+      - MONGO_URL=mongodb://the_username:the_password@mongodb/the_database
+    container_name: todo-backend
+
+  app:
+    image: todo-frontend
+    build:
+      context: .
+      dockerfile: ./todo-frontend/Dockerfile
+    volumes:
+      - ./todo-frontend/:/usr/src/app
+    container_name: todo-frontend
+
+  nginx:
+    image: nginx:1.20.1
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./todo-frontend/src:/usr/share/nginx/html
+    ports:
+      - 8080:80
+    container_name: reverse_proxy
+    depends_on:
+      - app
+      - server
+
+  mongodb:
+    image: mongo
+    restart: unless-stopped
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=the_username
+      - MONGO_INITDB_ROOT_PASSWORD=the_password
+    ports:
+      - 27017:27017
+    volumes:
+      - ./todo-backend/mongo/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js
+      - ./todo-backend/mongo_data:/data/db
+
+  redis:
+    image: redis
+    restart: unless-stopped
+    build: .
+    ports:
+      - 6379:6379
+    command: ['redis-server', '--appendonly', 'yes']
+    volumes:
+      - ./todo-backend/redis_data:/data

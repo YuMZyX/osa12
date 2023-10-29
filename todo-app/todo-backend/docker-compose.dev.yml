@@ -1,23 +1,42 @@
 version: '3.8'
 
 services:
-  mongo:
+  mongodb:
     image: mongo
-    ports:
-      - 3456:27017
+    restart: unless-stopped
+    env_file:
+      - ./.env
     environment:
-      MONGO_INITDB_ROOT_USERNAME: the_username
-      MONGO_INITDB_ROOT_PASSWORD: the_password
-      MONGO_INITDB_DATABASE: the_database
+      - MONGO_INITDB_ROOT_USERNAME=$MONGODB_USER
+      - MONGO_INITDB_ROOT_PASSWORD=$MONGODB_PASSWORD
+    ports:
+      - 27017:27017
     volumes:
       - ./mongo/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js
       - ./mongo_data:/data/db
 
   redis:
     image: redis
+    restart: unless-stopped
     build: .
     ports:
       - 6379:6379
     command: ['redis-server', '--appendonly', 'yes']
     volumes:
       - ./redis_data:/data
+
+  server:
+    image: todo-backend-dev
+    depends_on:
+      - mongodb
+      - redis
+    build:
+      context: .
+      dockerfile: dev.Dockerfile
+    volumes:
+      - ./:/usr/src/app
+    ports:
+      - 3001:3001
+    environment:
+      - REDIS_URL=redis://redis
+      - MONGO_URL=mongodb://the_username:the_password@mongodb/the_database
