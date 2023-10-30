@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  server:
+    image: bloglist-backend
+    build:
+      context: bloglist-backend
+      dockerfile: Dockerfile
+    ports:
+      - 3003:3003
+    volumes:
+      - ./bloglist-backend/:/usr/src/app
+      - /usr/src/app/node_modules
+    environment:
+      - MONGODB_URI=${MONGODB_URI}
+    container_name: bloglist-backend
+
+  app:
+    image: bloglist-frontend
+    build:
+      context: bloglist-frontend
+      dockerfile: Dockerfile
+    volumes:
+      - ./bloglist-frontend/dist:/usr/src/app/dist
+      - /usr/src/app/node_modules
+    container_name: bloglist-frontend
+
+  nginx:
+    image: nginx:1.20.1
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./bloglist-frontend/dist:/usr/share/nginx/html
+    ports:
+      - 8080:80
+    container_name: reverse_proxy
+    depends_on:
+      - app
+      - server
+    command: [nginx-debug, '-g', 'daemon off;']

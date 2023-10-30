@@ -8,6 +8,12 @@ export default defineConfig({
     watch: {
       usePolling: true
     }
-  }
+  },
+  /*
+  build: {
+    watch: './vite.config.js'
+  },
+  */
+  base: './',
 })
 
